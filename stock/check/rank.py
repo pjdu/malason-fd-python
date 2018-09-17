@@ -1,3 +1,4 @@
+# -*- coding:UTF-8 -*-
 # 基础库导入
 
 from __future__ import division
@@ -11,6 +12,7 @@ warnings.simplefilter('ignore')
 import os
 import sys
 import platform
+import pandas as pd
 
 # 使用insert 0即只使用github，避免交叉使用了pip安装的abupy，导致的版本不一致问题
 sys.path.insert(0, os.path.abspath('../'))
@@ -46,20 +48,26 @@ def get_file_fist(dir, ex_type):
 
 
 def calcChange(a, b):
-    return '%.2f%%' % round((b - a) / a * 100, 2)
+    return round((b - a) / a * 100, 2)
 
 
 def cal_stock_rank(ex_type, start_time, end_time):
-    stock_rank = []
+    symbols = []
+    ranges = []
     sotck_list = get_file_fist(data_source, ex_type)
     for stock in sotck_list:
         rank_info = stock.split('_')
         stock_symbol = rank_info[0]
         df = ABuSymbolPd.make_kl_df(stock_symbol, n_folds=8)[start_time:end_time]
         if not df.empty:
-            stock_rank.append({"symbol": stock_symbol, "range": calcChange(df['close'][0], df['close'][-1])})
+            symbols.append(stock_symbol)
+            ranges.append(calcChange(df['close'][0], df['close'][-1]))
+
+    stock_rank = pd.Series(ranges, index=symbols)
+    stock_rank.sort_values(ascending=False, inplace=True)
 
     return stock_rank
 
 
-cal_stock_rank("us", "2018-09-01", "2018-09-17")
+stock_rank = cal_stock_rank(sys.argv[1], sys.argv[2], sys.argv[3])
+print(stock_rank)
