@@ -50,7 +50,7 @@ def get_file_fist(dir, ex_type):
 def calcChange(a, b):
     return round((b - a) / a * 100, 2)
 
-
+# 全市场回测，股票涨幅排名
 def cal_stock_rank(ex_type, start_time, end_time):
     symbols = []
     ranges = []
