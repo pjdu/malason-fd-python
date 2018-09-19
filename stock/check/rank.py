@@ -61,6 +61,7 @@ def cal_stock_change(stock):
             end_price = df.iloc[-1]['close']
             return [stock_symbol, calcChange(start_price, end_price)]
         except Exception as e:
+            print(stock_symbol)
             print(e)
             return []
     else:
