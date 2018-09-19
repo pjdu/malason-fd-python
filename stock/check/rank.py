@@ -12,7 +12,9 @@ warnings.simplefilter('ignore')
 import os
 import sys
 import platform
+import pandas as pd
 from multiprocessing import Pool
+from terminaltables import AsciiTable
 
 # 使用insert 0即只使用github，避免交叉使用了pip安装的abupy，导致的版本不一致问题
 sys.path.insert(0, os.path.abspath('../'))
@@ -40,7 +42,7 @@ def get_file_fist(dir, ex_type):
     file_list = []
     for file in os.listdir(dir):
         if os.path.isfile(os.path.join(dir, file)) and file.startswith(ex_type):
-            file_list.append(file)
+            file_list.append(os.path.join(dir, file))
 
     return file_list
 
@@ -53,20 +55,29 @@ def cal_stock_change(stock):
     rank_info = stock.split('_')
     stock_symbol = rank_info[0]
     stock_symbol = stock_symbol.split('-')[0].split('*')[0].split('+')[0]
-    df = abupy.ABuSymbolPd.make_kl_df(stock_symbol, n_folds=8)[start_time:end_time]
+	# 缓存数据为abu安装内置数据，支持股票非常少，全量更新cvs文件后，不会更改缓存数据，此时make_kl_df其实是从网络更新数据（一般情况下），此处修改为直接读取cvs文件到df内，速度更快
+    #df = abupy.ABuSymbolPd.make_kl_df(stock_symbol, n_folds=8)[start_time:end_time]
+    f = open(stock)
+    try:
+        df = pd.read_csv(f)
+    except Exception as e:
+        print("读取csv文件异常" + stock_symbol)
+        return []
 
-    if any(df):
+    if not any(df):
+        print(stock_symbol)
+        return []
+    elif df.empty:
+        return []
+    else:
         try:
             start_price = df.iloc[0]['pre_close']
             end_price = df.iloc[-1]['close']
             return [stock_symbol, calcChange(start_price, end_price)]
         except Exception as e:
             print(stock_symbol)
-            print(e)
+            #print(e)
             return []
-    else:
-        print(stock_symbol)
-    return []
 
 
 def list_of_groups(init_list, children_list_len):
@@ -86,7 +97,9 @@ def cal_stock_rank(ex_type):
     pool.close()
     pool.join()
 
-    print(rl)
+    #价格排序后打印
+    table = AsciiTable(rl)
+    print(table.table)
     return rl
 
 
