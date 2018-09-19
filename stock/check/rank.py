@@ -4,8 +4,8 @@
 from __future__ import division
 from __future__ import print_function
 
+import multiprocessing
 import warnings
-from multiprocessing import Pool
 
 warnings.filterwarnings('ignore')
 warnings.simplefilter('ignore')
@@ -13,24 +13,26 @@ warnings.simplefilter('ignore')
 import os
 import sys
 import platform
+from multiprocessing import Pool
 
 # 使用insert 0即只使用github，避免交叉使用了pip安装的abupy，导致的版本不一致问题
 sys.path.insert(0, os.path.abspath('../'))
 import abupy
 
-# 使用沙盒数据，目的是和书中一样的数据环境
-abupy.env.enable_example_env_ipython()
-
 from abupy import ABuSymbolPd
 
 # 使用实时数据 abupy.env.enable_example_env_ipython()
-abupy.env.disable_example_env_ipython()
+# abupy.env.disable_example_env_ipython()
 
-sysstr = platform.system()
-if (sysstr == "Windows"):
-    data_source = "C:\\Users\\dell\\abu\\data\\csv"
-else:
-    data_source = "/root/abu/data/csv"
+def get_system_version():
+    sysstr = platform.system()
+    if (sysstr == "Windows"):
+        data_source = "C:\\Users\\dell\\abu\\data\\csv"
+    else:
+        data_source = "/root/abu/data/csv"
+
+    return data_source
+
 ex_type = "us"
 
 
@@ -51,12 +53,14 @@ def calcChange(a, b):
     return round((b - a) / a * 100, 2)
 
 
-def cal_stock_change(stock, start_time, end_time):
+def cal_stock_change(stock):
     rank_info = stock.split('_')
     stock_symbol = rank_info[0]
-#df = ABuSymbolPd.make_kl_df(stock_symbol, n_folds=8)[start_time:end_time]
-   # if not df.empty:
-    return {"symbol": stock_symbol, "range": 100}
+    df = ABuSymbolPd.make_kl_df(stock_symbol, n_folds=8)[start_time:end_time]
+    if not df.empty:
+        start_price = ABuSymbolPd.make_kl_df(stock_symbol, n_folds=8)[start_time:end_time].iloc[0]['pre_close']
+        end_price = ABuSymbolPd.make_kl_df(stock_symbol, n_folds=8)[start_time:end_time].iloc[-1]['close']
+        return [stock_symbol, calcChange(start_price, end_price)]
 
 
 def list_of_groups(init_list, children_list_len):
@@ -68,22 +72,29 @@ def list_of_groups(init_list, children_list_len):
 
 
 # 全市场回测，股票涨幅排名
-def cal_stock_rank(ex_type, start_time, end_time):
-    stock_list = get_file_fist(data_source, ex_type)
+def cal_stock_rank(ex_type):
+    stock_list = get_file_fist(get_system_version(), ex_type)
 
-    pool = Pool(500)
-    result = []
-    for stock in stock_list:
-        result.append(pool.apply(func=cal_stock_change, args=(stock, start_time, end_time,)))
-
+    pool = Pool(50)
+    rl = pool.map(cal_stock_change, stock_list)
     pool.close()
     pool.join()
 
-    print(result)
+    print(rl)
+    return rl
 
-    return result
 
+start_time = "2018-09-01"
+end_time = "2018-09-17"
+# stock_rank = cal_stock_rank(sys.argv[1], sys.argv[2], sys.argv[3])
+# stock_rank = cal_stock_rank("us")
+if __name__ == "__main__":
+    stock_list = get_file_fist(get_system_version(), ex_type)
+    pool = Pool(50)
+    rl = pool.map(cal_stock_change, stock_list)
+    pool.close()
+    pool.join()
 
-#stock_rank = cal_stock_rank(sys.argv[1], sys.argv[2], sys.argv[3])
-stock_rank = cal_stock_rank("us", "2018-09-01", "2018-09-17")
+    print(rl)
+
 
