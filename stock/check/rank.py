@@ -4,7 +4,6 @@
 from __future__ import division
 from __future__ import print_function
 
-import multiprocessing
 import warnings
 
 warnings.filterwarnings('ignore')
@@ -19,10 +18,9 @@ from multiprocessing import Pool
 sys.path.insert(0, os.path.abspath('../'))
 import abupy
 
-from abupy import ABuSymbolPd
-
 # 使用实时数据 abupy.env.enable_example_env_ipython()
 abupy.env.disable_example_env_ipython()
+
 
 def get_system_version():
     sysstr = platform.system()
@@ -56,18 +54,18 @@ def cal_stock_change(stock):
     stock_symbol = rank_info[0]
     stock_symbol = stock_symbol.split('-')[0].split('*')[0].split('+')[0]
     df = abupy.ABuSymbolPd.make_kl_df(stock_symbol, n_folds=8)[start_time:end_time]
-	
+
     if any(df):
-	    try:
+        try:
             start_price = df.iloc[0]['pre_close']
             end_price = df.iloc[-1]['close']
             return [stock_symbol, calcChange(start_price, end_price)]
-		except  Error as e:
-            print(e.message)
-            return []        
+        except Exception as e:
+            print(e)
+            return []
     else:
         print(stock_symbol)
-        return []
+    return []
 
 
 def list_of_groups(init_list, children_list_len):
@@ -90,12 +88,9 @@ def cal_stock_rank(ex_type):
     print(rl)
     return rl
 
+
 ex_type = sys.argv[1]
 start_time = sys.argv[2]
 end_time = sys.argv[3]
 
 cal_stock_rank(ex_type)
-
-
-
-
