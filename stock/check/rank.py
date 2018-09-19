@@ -22,7 +22,7 @@ import abupy
 from abupy import ABuSymbolPd
 
 # 使用实时数据 abupy.env.enable_example_env_ipython()
-# abupy.env.disable_example_env_ipython()
+abupy.env.disable_example_env_ipython()
 
 def get_system_version():
     sysstr = platform.system()
@@ -32,8 +32,6 @@ def get_system_version():
         data_source = "/root/abu/data/csv"
 
     return data_source
-
-ex_type = "us"
 
 
 # 获取目录下所有文件名
@@ -56,11 +54,20 @@ def calcChange(a, b):
 def cal_stock_change(stock):
     rank_info = stock.split('_')
     stock_symbol = rank_info[0]
-    df = ABuSymbolPd.make_kl_df(stock_symbol, n_folds=8)[start_time:end_time]
-    if not df.empty:
-        start_price = ABuSymbolPd.make_kl_df(stock_symbol, n_folds=8)[start_time:end_time].iloc[0]['pre_close']
-        end_price = ABuSymbolPd.make_kl_df(stock_symbol, n_folds=8)[start_time:end_time].iloc[-1]['close']
-        return [stock_symbol, calcChange(start_price, end_price)]
+    stock_symbol = stock_symbol.split('-')[0].split('*')[0].split('+')[0]
+    df = abupy.ABuSymbolPd.make_kl_df(stock_symbol, n_folds=8)[start_time:end_time]
+	
+    if any(df):
+	    try:
+            start_price = df.iloc[0]['pre_close']
+            end_price = df.iloc[-1]['close']
+            return [stock_symbol, calcChange(start_price, end_price)]
+		except  Error as e:
+            print(e.message)
+            return []        
+    else:
+        print(stock_symbol)
+        return []
 
 
 def list_of_groups(init_list, children_list_len):
@@ -75,7 +82,7 @@ def list_of_groups(init_list, children_list_len):
 def cal_stock_rank(ex_type):
     stock_list = get_file_fist(get_system_version(), ex_type)
 
-    pool = Pool(50)
+    pool = Pool(20)
     rl = pool.map(cal_stock_change, stock_list)
     pool.close()
     pool.join()
@@ -83,18 +90,12 @@ def cal_stock_rank(ex_type):
     print(rl)
     return rl
 
+ex_type = sys.argv[1]
+start_time = sys.argv[2]
+end_time = sys.argv[3]
 
-start_time = "2018-09-01"
-end_time = "2018-09-17"
-# stock_rank = cal_stock_rank(sys.argv[1], sys.argv[2], sys.argv[3])
-# stock_rank = cal_stock_rank("us")
-if __name__ == "__main__":
-    stock_list = get_file_fist(get_system_version(), ex_type)
-    pool = Pool(50)
-    rl = pool.map(cal_stock_change, stock_list)
-    pool.close()
-    pool.join()
+cal_stock_rank(ex_type)
 
-    print(rl)
+
 
 
