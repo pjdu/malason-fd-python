@@ -5,12 +5,15 @@ from __future__ import print_function
 
 import warnings
 
+import abupy
+
 warnings.filterwarnings('ignore')
 warnings.simplefilter('ignore')
 
 import numpy as np
 import platform
 import pandas as pd
+from abupy import ABuSymbolPd, EMarketSourceType
 from terminaltables import AsciiTable
 
 import os
@@ -49,13 +52,18 @@ stock_symbol = sys.argv[2]
 data_dir = get_system_version()
 stock_list = get_file_fist(data_dir, ex_type)
 
+stock_file_name = ""
 for stock in stock_list:
     if stock.startswith(ex_type + stock_symbol + "_"):
         stock_file_name = stock
         break
 
-f = open(os.path.join(data_dir, stock_file_name))
-df = pd.read_csv(f, index_col=0)
+if not stock_file_name:
+    abupy.env.g_market_source = EMarketSourceType.E_MARKET_SOURCE_nt
+    df = ABuSymbolPd.make_kl_df(stock_symbol)
+else:
+    f = open(os.path.join(data_dir, stock_file_name))
+    df = pd.read_csv(f, index_col=0)
 
 if len(sys.argv) == 5:
     df = df[sys.argv[3]:sys.argv[4]]
