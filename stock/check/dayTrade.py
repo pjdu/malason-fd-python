@@ -13,6 +13,7 @@ warnings.simplefilter('ignore')
 import numpy as np
 import platform
 import pandas as pd
+import abupy
 from abupy import ABuSymbolPd, EMarketSourceType
 from terminaltables import AsciiTable
 
