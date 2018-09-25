@@ -17,8 +17,9 @@ from multiprocessing import Pool
 from terminaltables import AsciiTable
 
 # 使用insert 0即只使用github，避免交叉使用了pip安装的abupy，导致的版本不一致问题
-#sys.path.insert(0, os.path.abspath('../'))
+# sys.path.insert(0, os.path.abspath('../'))
 import abupy
+
 
 # 使用实时数据 abupy.env.enable_example_env_ipython()
 # abupy.env.disable_example_env_ipython()
@@ -101,7 +102,10 @@ def cal_stock_change(stock):
         try:
             start_price = df.iloc[0]['pre_close']
             end_price = df.iloc[-1]['close']
-            return [stock_symbol, calcChange(start_price, end_price)]
+            if end_price < 1:
+                return []
+            else:
+                return [stock_symbol, calcChange(start_price, end_price)]
         except Exception as e:
             print(stock_symbol)
             # print(e)
