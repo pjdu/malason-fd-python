@@ -17,11 +17,11 @@ from multiprocessing import Pool
 from terminaltables import AsciiTable
 
 # 使用insert 0即只使用github，避免交叉使用了pip安装的abupy，导致的版本不一致问题
-sys.path.insert(0, os.path.abspath('../'))
+#sys.path.insert(0, os.path.abspath('../'))
 import abupy
 
 # 使用实时数据 abupy.env.enable_example_env_ipython()
-abupy.env.disable_example_env_ipython()
+# abupy.env.disable_example_env_ipython()
 
 
 def get_system_version():
@@ -122,6 +122,10 @@ def cal_stock_rank(ex_type):
 
     quick_sort(rl, 0, len(rl) - 1)
     print_list = rl[page_begin_num:page_num]
+
+    for print_str in print_list:
+        print_str[1] = str(print_str[1]) + "%"
+
     print_list.insert(0, ['symbol', 'range'])
     table = AsciiTable(print_list)
     print(table.table)
