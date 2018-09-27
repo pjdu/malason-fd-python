@@ -52,13 +52,13 @@ f = open(os.path.join(data_dir, stock_file_name))
 df = pd.read_csv(f, index_col=0)
 
 # df = ABuSymbolPd.make_kl_df(stock_symbol, n_folds=5)
-df['range'] = df.apply(lambda row: calc_change(row['low'], row['high']), axis=1)
+df['range'] = df.apply(lambda row: calc_change(row['pre_close'], row['close']), axis=1)
 
 stock_day_change = df.range.values
 stock_mean = stock_day_change.mean()
 stock_std = stock_day_change.std()
 
-plt.hist(stock_day_change, bins=100, normed=True)
+plt.hist(stock_day_change, bins=50, normed=True)
 fit_linespace = np.linspace(stock_day_change.min(), stock_day_change.max())
 pdf = scs.norm(stock_mean, stock_std).pdf(fit_linespace)
 plt.plot(fit_linespace, pdf, lw=2, c='r')
