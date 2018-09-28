@@ -60,7 +60,7 @@ for stock in stock_list:
         break
 
 if not stock_file_name:
-    abupy.env.g_market_source = EMarketSourceType.E_MARKET_SOURCE_nt
+    abupy.env.g_market_source = EMarketSourceType.E_MARKET_SOURCE_sn_us
     df = ABuSymbolPd.make_kl_df(stock_symbol)
 else:
     f = open(os.path.join(data_dir, stock_file_name))

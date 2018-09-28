@@ -52,7 +52,7 @@ def update_data(market_target):
     current_time = time.strftime('%Y-%m-%d', time.localtime(time.time()))
 
     # 切换至腾讯数据源，然后进行全市场更新
-    abupy.env.g_market_source = EMarketSourceType.E_MARKET_SOURCE_nt
+    abupy.env.g_market_source = EMarketSourceType.E_MARKET_SOURCE_sn_us
     abupy.env.g_data_cache_type = EDataCacheType.E_DATA_CACHE_CSV
 
     for case in switch(market_target):

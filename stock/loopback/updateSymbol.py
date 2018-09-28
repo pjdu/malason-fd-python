@@ -29,7 +29,7 @@ def update_data(symbol):
     current_time_format_1 = time.strftime('%Y-%m-%d', time.localtime(time.time()))
     current_time_format_2 = time.strftime('%Y%m%d', time.localtime(time.time()))
 
-    abupy.env.g_market_source = EMarketSourceType.E_MARKET_SOURCE_nt
+    abupy.env.g_market_source = EMarketSourceType.E_MARKET_SOURCE_sn_us
     abupy.env.g_data_cache_type = EDataCacheType.E_DATA_CACHE_CSV
 
     df = ABuSymbolPd.make_kl_df(symbol, n_folds=None, start='2012-01-01', end=current_time_format_1)
