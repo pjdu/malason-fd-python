@@ -12,3 +12,6 @@ python rank.py "us" "2018-09-01" "2018-09-17"
 3. 比较基准QQQ、版块
 
 4. 同板块其他股票涨幅排行
+
+5. http://finance.sina.com.cn/stock/usstock/sector.shtml#f_pqph
+   美股版块信息：雪球和新浪财经都有
