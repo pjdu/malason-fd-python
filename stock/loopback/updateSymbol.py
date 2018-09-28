@@ -36,5 +36,5 @@ def update_data(symbol):
     ABuDataCache.save_kline_df(df, symbol, '20120101', current_time_format_2)
 
 
-symbo = abupy.ABuSymbol.code_to_symbol("MSFT")
-update_data(symbo)
+symbol = abupy.ABuSymbol.code_to_symbol(sys.argv[1])
+update_data(symbol)
