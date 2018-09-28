@@ -47,7 +47,7 @@ def get_system_version():
 
 
 def calc_change(a, b):
-    return str(round((b - a) / a * 100, 2))
+    return round((b - a) / a * 100, 2)
 
 
 def update_data(symbol):
@@ -99,6 +99,7 @@ def calc_stock_df(symbol):
         return df.tail(1)[
             ['date', 'symbol', 'name', 'p_change', 'range', 'pre_close', 'open', 'close', 'volume', 'high', 'low']]
 
+
 file_path = "./" + sys.argv[1] + ".csv"
 f = open(file_path)
 df = pd.read_csv(f, usecols=[0, 1])
@@ -112,7 +113,7 @@ pool.join()
 
 df = pd.concat(data)
 df.sort_values("p_change", ascending=False, inplace=True)
-df['p_change'] = df.apply(lambda row: round(row['p_change'], 2), axis=1)
+df.round(2)
 
 head = list(df)
 nr = df.values.tolist()
