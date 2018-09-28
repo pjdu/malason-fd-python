@@ -5,7 +5,11 @@ from __future__ import print_function
 
 import json
 import warnings
+import time
 from multiprocessing import Pool
+
+import abupy
+from abupy.MarketBu import ABuDataCache
 
 warnings.filterwarnings('ignore')
 warnings.simplefilter('ignore')
@@ -46,6 +50,19 @@ def calc_change(a, b):
     return str(round((b - a) / a * 100, 2))
 
 
+def update_data(symbol):
+    current_time_format_1 = time.strftime('%Y-%m-%d', time.localtime(time.time()))
+    current_time_format_2 = time.strftime('%Y%m%d', time.localtime(time.time()))
+
+    abupy.env.g_market_source = abupy.EMarketSourceType.E_MARKET_SOURCE_nt
+    abupy.env.g_data_cache_type = abupy.EDataCacheType.E_DATA_CACHE_CSV
+
+    df = abupy.ABuSymbolPd.make_kl_df(symbol, n_folds=None, start='2012-01-01', end=current_time_format_1)
+    ABuDataCache.save_kline_df(df, symbol, '20120101', current_time_format_2)
+
+    return df
+
+
 data_dir = get_system_version()
 stock_list = get_file_fist(data_dir, 'us')
 
@@ -59,10 +76,15 @@ def calc_stock_df(symbol):
             break
 
     if not stock_file_name:
-        return []
+        symbol_stock = abupy.ABuSymbol.code_to_symbol(symbol[0])
+        df = update_data(symbol_stock)
     else:
         f = open(os.path.join(data_dir, stock_file_name))
         df = pd.read_csv(f, index_col=0)
+
+    if df is None:
+        print(symbol)
+        return
 
     if len(sys.argv) == 3:
         df = df[sys.argv[1]:sys.argv[2]]
@@ -89,7 +111,7 @@ pool.close()
 pool.join()
 
 df = pd.concat(data)
-df.sort_values("p_change", ascending=True, inplace=True)
+df.sort_values("p_change", ascending=False, inplace=True)
 df['p_change'] = df.apply(lambda row: round(row['p_change'], 2), axis=1)
 
 head = list(df)
