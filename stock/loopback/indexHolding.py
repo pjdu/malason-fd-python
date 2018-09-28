@@ -69,14 +69,14 @@ stock_list = get_file_fist(data_dir, 'us')
 
 def calc_stock_df(symbol):
     stock_file_name = ""
-    stock_symbol = symbol[0]
+    stock_symbol = symbol[1]
     for stock in stock_list:
         if stock.startswith('us' + stock_symbol + "_"):
             stock_file_name = stock
             break
 
     if not stock_file_name:
-        symbol_stock = abupy.ABuSymbol.code_to_symbol(symbol[0])
+        symbol_stock = abupy.ABuSymbol.code_to_symbol(symbol[1])
         df = update_data(symbol_stock)
     else:
         f = open(os.path.join(data_dir, stock_file_name))
@@ -91,19 +91,18 @@ def calc_stock_df(symbol):
         start_price = df.iloc[0]['pre_close']
         end_price = df.iloc[-1]['close']
         return pd.DataFrame(
-            {'symbol': [stock_symbol], "name": [symbol[1]], 'p_change': [calc_change(start_price, end_price)]})
+            {'symbol': [stock_symbol], "name": [symbol[0]], 'p_change': [calc_change(start_price, end_price)]})
     else:
         df['range'] = df.apply(lambda row: calc_change(row['low'], row['high']), axis=1)
         df['symbol'] = stock_symbol
-        df['name'] = symbol[1]
+        df['name'] = symbol[0]
         return df.tail(1)[
             ['date', 'symbol', 'name', 'p_change', 'range', 'pre_close', 'open', 'close', 'volume', 'high', 'low']]
 
-
-file_path = "./" + sys.argv[1] + ".json"
-with open(file_path, "r") as load_f:
-    stock_symbols = json.load(load_f)
-
+file_path = "./" + sys.argv[1] + ".csv"
+f = open(file_path)
+df = pd.read_csv(f, usecols=[0, 1])
+stock_symbols = np.array(df).tolist()
 data = []
 
 pool = Pool(20)
