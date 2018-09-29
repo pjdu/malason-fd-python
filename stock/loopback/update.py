@@ -1,20 +1,15 @@
 # -*- coding:UTF-8 -*-
 # 基础库导入
-from __future__ import print_function
 from __future__ import division
+from __future__ import print_function
 
+import datetime
 import warnings
 
 warnings.filterwarnings('ignore')
 warnings.simplefilter('ignore')
 
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-
 import os
-import sys
-import time
 import sys
 
 # 使用insert 0即只使用github，避免交叉使用了pip安装的abupy，导致的版本不一致问题
@@ -24,9 +19,9 @@ import abupy
 # 使用实时数据 abupy.env.enable_example_env_ipython()
 abupy.env.disable_example_env_ipython()
 
-from abupy import abu, EMarketTargetType, AbuMetricsBase, ABuMarketDrawing, ABuProgress, ABuSymbolPd, get_price, ABuIndustries
-from abupy import EMarketDataFetchMode, EDataCacheType, EMarketSourceType, FuturesBaseMarket, TCBaseMarket, ABuDateUtil
-from abupy import AbuDataParseWrap, StockBaseMarket, SupportMixin, ABuNetWork, Symbol, code_to_symbol
+from abupy import abu, EMarketTargetType
+from abupy import EDataCacheType, EMarketSourceType
+
 
 class switch(object):
     def __init__(self, value):
@@ -49,7 +44,7 @@ class switch(object):
             return False
 
 def update_data(market_target):
-    current_time = time.strftime('%Y-%m-%d', time.localtime(time.time()))
+    current_time = datetime.datetime.now().strftime('%Y-%m-%d')
 
     # 切换至腾讯数据源，然后进行全市场更新
     abupy.env.g_market_source = EMarketSourceType.E_MARKET_SOURCE_sn_us
