@@ -42,3 +42,5 @@ def batch_fetch_data():
 
 
 fetch_trade_cal()
+fetch_stock()
+batch_fetch_data()
