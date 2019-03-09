@@ -24,13 +24,14 @@ stock_list = [{'ts_code': '399006.SZ', 'ts_name': "创业板指"},
               {'ts_code': '399951.SZ', 'ts_name': "300银行"},
               {'ts_code': '000016.SH', 'ts_name': "上证50"},
               {'ts_code': '399919.SZ', 'ts_name': "300价值"},
-              {'ts_code': '399952.SZ', 'ts_name': "300地产"}];
+              {'ts_code': '399952.SZ', 'ts_name': "300地产"}]
 
-line = Line("指数行情")
+line = Line("指数行情", width=1600, height=800)
 for stock in stock_list:
     df = pro.index_daily(ts_code=stock['ts_code'], adj='qfq', start_date=startDate, end_date=endDate)
     if df is not None:
-        line.add(stock['ts_name'], df['trade_date'], df['close'], mark_point=["max", "min"])
+        df = df.sort_index(ascending=True)
         line.add(stock['ts_name'], df['trade_date'], df['close'], mark_point=["max", "min"])
 
-line.render('index.html')
+line.show_config()
+line.render('index_daily.html')
