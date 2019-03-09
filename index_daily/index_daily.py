@@ -13,14 +13,14 @@ pro = ts.pro_api()
 大盘指数历史走势
 """
 
-startDate = '20190101'
+startDate = '20150101'
 endDate = time.strftime('%Y%m%d', time.localtime(time.time()))
 
 stock_list = [{'ts_code': '399006.SZ', 'ts_name': "创业板指"},
               {'ts_code': '399005.SZ', 'ts_name': "中小板指"},
               {'ts_code': '000037.SH', 'ts_name': "上证医药"},
               {'ts_code': '399004.SZ', 'ts_name': "深证100R"},
-              {'ts_code': '510310.SH', 'ts_name': "沪深300"},
+              {'ts_code': '399300.SZ', 'ts_name': "沪深300"},
               {'ts_code': '399951.SZ', 'ts_name': "300银行"},
               {'ts_code': '000016.SH', 'ts_name': "上证50"},
               {'ts_code': '399919.SZ', 'ts_name': "300价值"},
@@ -28,11 +28,11 @@ stock_list = [{'ts_code': '399006.SZ', 'ts_name': "创业板指"},
 
 page = Page()
 for stock in stock_list:
-    line = Line(stock['ts_name'])
+    line = Line(width=1600)
     df = pro.index_daily(ts_code=stock['ts_code'], adj='qfq', start_date=startDate, end_date=endDate)
     if df is not None:
         df = df.sort_values(by="trade_date", ascending=True)
-        line.add(stock['ts_name'], df['trade_date'], df['close'], mark_point=["max", "min"])
-        page.add_chart(line, name='line')
+        line.add(stock['ts_name'], df['trade_date'], df['close'], yaxis_min = 'dataMin')
+        page.add_chart(line)
 
 page.render('index_daily.html')
