@@ -27,7 +27,7 @@ for stock in stock_list:
     df = ts.pro_bar(pro_api=pro, ts_code=stock['ts_code'], adj='qfq', start_date=startDate, end_date=endDate)
     if df is not None:
         df = df.sort_index(ascending=True)
-        line.add(stock['ts_name'], df['trade_date'], df['close'], mark_point=["max", "min"])
+        line.add(stock['ts_name'], df['trade_date'], df['close'], mark_point=["max", "min"], mark_line_symbolsize=70)
         page.add_chart(line)
 
 page.render('market_daily.html')
