@@ -1,7 +1,7 @@
 import sys, os
 import tushare as ts
 import time
-from pyecharts import Line
+from pyecharts import Line, Page
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(BASE_DIR)
@@ -13,7 +13,7 @@ pro = ts.pro_api()
 大盘指数历史走势
 """
 
-startDate = '20150101'
+startDate = '20190101'
 endDate = time.strftime('%Y%m%d', time.localtime(time.time()))
 
 stock_list = [{'ts_code': '399006.SZ', 'ts_name': "创业板指"},
@@ -26,12 +26,13 @@ stock_list = [{'ts_code': '399006.SZ', 'ts_name': "创业板指"},
               {'ts_code': '399919.SZ', 'ts_name': "300价值"},
               {'ts_code': '399952.SZ', 'ts_name': "300地产"}]
 
-line = Line("指数行情", width=1600, height=800)
+page = Page()
 for stock in stock_list:
+    line = Line(stock['ts_name'])
     df = pro.index_daily(ts_code=stock['ts_code'], adj='qfq', start_date=startDate, end_date=endDate)
     if df is not None:
-        df = df.sort_index(ascending=True)
+        df = df.sort_values(by="trade_date", ascending=True)
         line.add(stock['ts_name'], df['trade_date'], df['close'], mark_point=["max", "min"])
+        page.add_chart(line, name='line')
 
-line.show_config()
-line.render('index_daily.html')
+page.render('index_daily.html')
