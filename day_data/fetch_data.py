@@ -37,16 +37,19 @@ def fetch_stock():
 
 def fetch_task(index, symbol):
     engine_index = index % 12;
-    df = ts.pro_bar(pro_api=pro, ts_code=symbol, adj='qfq', start_date=startDate, end_date=endDate)
-    if df is not None:
-        df.to_sql('m_fd_data_' + symbol, engineList[engine_index], index=False, if_exists='replace')
-    else:
-        print("fetch data meet exception, the stock is " + symbol)
+    for _ in range(3):
+        try:
+            df = ts.pro_bar(pro_api=pro, ts_code=symbol, adj='qfq', start_date=startDate, end_date=endDate)
+            df.to_sql('m_fd_data_' + symbol, engineList[engine_index], index=False, if_exists='replace')
+        except:
+            time.sleep(2)
+        else:
+            print("fetch data meet exception, the stock is " + symbol)
 
 
 def batch_fetch_data():
     data = pro.query('stock_basic', exchange='', list_status='L', fields='ts_code,symbol,name,area,industry,list_date')
-    with ThreadPoolExecutor(10) as execute:
+    with ThreadPoolExecutor(20) as execute:
         for index, symbol in enumerate(data['ts_code']):
             execute.submit(fetch_task, index, symbol)
 
