@@ -14,7 +14,7 @@ pro = ts.pro_api()
 历史行情数据，保存到mysql
 """
 
-startDate = '20100101'
+startDate = '20150101'
 endDate = time.strftime('%Y%m%d', time.localtime(time.time()))
 
 database = 'mysql+pymysql://root:hefei168lj@localhost/'
@@ -40,6 +40,8 @@ def fetch_task(index, symbol):
     df = ts.pro_bar(pro_api=pro, ts_code=symbol, adj='qfq', start_date=startDate, end_date=endDate)
     if df is not None:
         df.to_sql('m_fd_data_' + symbol, engineList[engine_index], index=False, if_exists='replace')
+    else:
+        print("fetch data meet exception, the stock is " + symbol)
 
 
 def batch_fetch_data():

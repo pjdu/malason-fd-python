@@ -9,8 +9,8 @@ pro = ts.pro_api()
 财报数据
 """
 
-ts_code = '601012.SH'
-ts_name = '隆基股份'
+ts_code = '601318.SH'
+ts_name = '中国平安'
 startDate = '20150101'
 endDate = time.strftime('%Y%m%d', time.localtime(time.time()))
 page = Page()
