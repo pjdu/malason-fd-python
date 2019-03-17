@@ -36,7 +36,7 @@ def fetch_stock():
 
 
 def fetch_task(index, symbol):
-    engine_index = index % 12;
+    engine_index = index % 12
     for _ in range(3):
         try:
             df = ts.pro_bar(pro_api=pro, ts_code=symbol, adj='qfq', start_date=startDate, end_date=endDate)
